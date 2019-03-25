@@ -107,7 +107,7 @@ whileM c f = go
             then f a >>= go
             else return a
 
--- Returns 'True' for numbers that specify zipper movement.
+-- Returns 'True' for numbers that represent movement instructions.
 --
 -- >>> map isControl [-1..3]
 -- [False,True,True,True,False]
