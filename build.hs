@@ -5,17 +5,20 @@ module Main where
 import Criterion.Main
 import Data.Int
 
+-- Redundant 2-3 tree.
 data Tree
     = Leaf
     | Node2 !Tree !Int64 !Tree
     | Node3 !Tree !Int64 !Tree !Int64 !Tree
     deriving (Show, Eq)
 
+-- The focus of the zipper.
 data Nonempty
     = Nonempty2 !Tree !Int64 !Tree
     | Nonempty3 !Tree !Int64 !Tree !Int64 !Tree
     deriving (Show, Eq)
 
+-- A single choice on the path from the root to the focus.
 data PathChoice
     = Path2L {- -} !Int64 !Tree
     | Path2R !Tree !Int64 {- -}
@@ -24,21 +27,41 @@ data PathChoice
     | Path3R !Tree !Int64 !Tree !Int64 {- -}
     deriving (Show, Eq)
 
+-- Path from the root to the focus.
 data Path = Nil | Cons !PathChoice !Path
     deriving (Show, Eq)
 
+-- 2-3 tree zipper.
 data Zipper = Zipper !Nonempty !Path
     deriving (Show, Eq)
 
 data Dir = L | R
     deriving (Show, Eq)
 
+-- Create a 2-3 tree containing a single element.
+--
+-- >>> singleton 1
+-- Node2 Leaf 1 Leaf
+--
 singleton :: Int64 -> Tree
 singleton v = Node2 Leaf v Leaf
 
+-- Create a 2-3 tree zipper containing a single element.
+--
+-- >>> singletonZ 1
+-- Zipper (Nonempty2 Leaf 1 Leaf) Nil
+--
 singletonZ :: Int64 -> Zipper
 singletonZ v = Zipper (Nonempty2 Leaf v Leaf) Nil
 
+-- Reconstruct the 2-3 tree from a zipper.
+--
+-- This function moves the focus to the root and then
+-- reconstructs the root node.
+--
+-- >>> top (singletonZ 1)
+-- Node2 Leaf 1 Leaf
+--
 top :: Zipper -> Tree
 top (Zipper node path) = case node of
     Nonempty2 l x r     -> go path (Node2 l x r)
@@ -53,8 +76,18 @@ top (Zipper node path) = case node of
     fill m (Path3M l x y r) = Node3 l x m y r
     fill r (Path3R l x m y) = Node3 l x m y r
 
+-- Result of a tree insert operation.
 data Inserted = Done !Tree | Split !Tree !Int64 !Tree
 
+-- Insert a value into a 2-3 tree. If the value is
+-- already present in the tree, do nothing.
+--
+-- >>> insertTree 0 Leaf
+-- Node2 Leaf 0 Leaf
+--
+-- >>> foldr insertTree Leaf [1..5]
+-- Node3 (Node2 Leaf 1 Leaf) 2 (Node3 Leaf 2 Leaf 3 Leaf) 4 (Node3 Leaf 4 Leaf 5 Leaf)
+--
 insertTree :: Int64 -> Tree -> Tree
 insertTree !v !t = case go t of
     Done d      -> d
@@ -93,6 +126,19 @@ insertTree !v !t = case go t of
             Done r'        -> Done (Node3 l x m y r')
             Split rl v' rr -> Split (Node2 l x m) y (Node2 rl v' rr)
 
+-- Insert a value into 2-3 tree zipper. If the value is already
+-- present, do nothing. Returns a zipper focused on the node
+-- containing the new value.
+--
+-- Note that this function assumes that the focus is already in the
+-- correct position.
+--
+-- >>> insertZipper 1 (singletonZ 0)
+-- Zipper (Nonempty3 Leaf 0 Leaf 1 Leaf) Nil
+--
+-- >>> foldr insertZipper (singletonZ 0) [1,2]
+-- Zipper (Nonempty3 Leaf 1 Leaf 2 Leaf) (Cons (Path2R (Node2 Leaf 0 Leaf) 1) Nil)
+--
 insertZipper :: Int64 -> Zipper -> Zipper
 insertZipper !v (Zipper node path) = case node of
     Nonempty2 _ x _
@@ -123,6 +169,10 @@ insertZipper !v (Zipper node path) = case node of
 
 -- Generate a tree by inserting all natural numbers less than or equal to 'start'
 -- in descending order.
+--
+-- >>> generate 4
+-- Node3 (Node2 Leaf 0 Leaf) 1 (Node3 Leaf 1 Leaf 2 Leaf) 3 (Node3 Leaf 3 Leaf 4 Leaf)
+--
 generate :: Int64 -> Tree
 generate !start = go start (singleton start)
   where
@@ -131,6 +181,10 @@ generate !start = go start (singleton start)
         | otherwise = t
 
 -- Same as above except that zipper is used as the intermediate structure.
+--
+-- >>> generateZ 4
+-- Node3 (Node2 Leaf 0 Leaf) 1 (Node3 Leaf 1 Leaf 2 Leaf) 3 (Node3 Leaf 3 Leaf 4 Leaf)
+--
 generateZ :: Int64 -> Tree
 generateZ !start = top $ go start (singletonZ start)
   where
