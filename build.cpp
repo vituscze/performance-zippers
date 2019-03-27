@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <iostream>
 #include <numeric>
+#include <sstream>
 #include <vector>
 
 struct tree_t
@@ -248,50 +249,73 @@ std::pair<double, double> analyze(It begin, It end)
   return {mean, stddev};
 }
 
-int main()
+int main(int argc, char** argv)
 {
-  constexpr int MAX_ITER = 100;
+  using namespace std::chrono;
   constexpr int SIZE = 10000000;
+
+  int time_limit;
+
+  {
+    std::stringstream s(argv[1]);
+    s >> time_limit;
+  }
 
   {
     std::vector<double> finger_results;
 
-    for (int i = 0; i < MAX_ITER; i++)
+    auto measurement_start = high_resolution_clock::now();
+    for (int i = 1;; i++)
     {
-      auto start = std::chrono::high_resolution_clock::now();
+      auto start = high_resolution_clock::now();
+      for (int j = 0; j < i; j++)
       {
         tree_t t;
         for (int64_t k = SIZE; k >= 0; k--)
           t.insert_last(k);
       }
-      auto end = std::chrono::high_resolution_clock::now();
-      std::chrono::duration<double, std::milli> diff = end - start;
-      finger_results.push_back(diff.count());
+      auto end = high_resolution_clock::now();
+      duration<double, std::milli> diff = end - start;
+      finger_results.push_back(diff.count() / i);
+      if (duration_cast<milliseconds>(end - measurement_start).count() > time_limit)
+        break;
     }
 
     auto result = analyze(finger_results.begin(), finger_results.end());
     std::cout << "finger_mean = " << result.first << " ms\n";
     std::cout << "finger_stddev = " << result.second << " ms\n";
+    std::cout << "finger_results = ";
+    for (auto d : finger_results)
+      std::cout << d << ",";
+    std::cout << "\n";
   }
 
   {
     std::vector<double> root_results;
 
-    for (int i = 0; i < MAX_ITER; i++)
+    auto measurement_start = high_resolution_clock::now();
+    for (int i = 1;; i++)
     {
-      auto start = std::chrono::high_resolution_clock::now();
+      auto start = high_resolution_clock::now();
+      for (int j = 0; j < i; j++)
       {
         tree_t t;
         for (int64_t k = SIZE; k >= 0; k--)
           t.insert(k);
       }
-      auto end = std::chrono::high_resolution_clock::now();
-      std::chrono::duration<double, std::milli> diff = end - start;
-      root_results.push_back(diff.count());
+      auto end = high_resolution_clock::now();
+      duration<double, std::milli> diff = end - start;
+      root_results.push_back(diff.count() / i);
+      if (duration_cast<milliseconds>(end - measurement_start).count() > time_limit)
+        break;
     }
 
     auto result = analyze(root_results.begin(), root_results.end());
     std::cout << "root_mean = " << result.first << " ms\n";
     std::cout << "root_stddev = " << result.second << " ms\n";
+    std::cout << "root_results = ";
+    for (auto d : root_results)
+      std::cout << d << ",";
+    std::cout << "\n";
   }
 }
