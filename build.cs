@@ -259,6 +259,7 @@ namespace Tree23
               t.InsertLast(k);
             }
           }
+          local.Stop();
           fingerResults.Add((double)local.ElapsedMilliseconds / i);
           if (total.ElapsedMilliseconds > timeLimit)
             break;
