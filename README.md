@@ -43,9 +43,9 @@ The input files for testing no bias, bottom bias, right bias, and bottom-right b
 generated as follows:
 
     runhaskell generate.hs 1000000 20 0 2 > balanced.txt
-    runhaskell generate.hs 1000000 20 0 4 > bottom.txt
+    runhaskell generate.hs 1000000 20 0 5 > bottom.txt
     runhaskell generate.hs 1000000 20 1 2 > right.txt
-    runhaskell generate.hs 1000000 20 1 4 > bottom_right.txt
+    runhaskell generate.hs 1000000 20 1 5 > bottom_right.txt
 
 The script isn't really optimized, you might wish to compile the generate script to
 speed up this process.
