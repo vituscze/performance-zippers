@@ -37,6 +37,14 @@ The source files were compiled with:
 
       ghc -O2 -fllvm -o <name>_hs.exe <name>.hs
 
+## Dependencies
+
+C++ and C# programs depend on their respective standard libraries. Haskell depends on the following packages:
+
+    build.hs: base, criterion
+    traverse.hs: base, bytestring, criterion, mtl, unboxed-ref, vector
+    generate.hs base, mtl, random
+
 ## Input Files
 
 The input files for testing no bias, bottom bias, right bias, and bottom-right bias were
