@@ -41,9 +41,9 @@ The source files were compiled with:
 
 C++ and C# programs depend on their respective standard libraries. Haskell depends on the following packages:
 
-    build.hs: base, criterion
-    traverse.hs: base, bytestring, criterion, mtl, unboxed-ref, vector
-    generate.hs base, mtl, random
+* `build.hs`: base, criterion
+* `traverse.hs`: base, bytestring, criterion, mtl, unboxed-ref, vector
+* `generate.hs`: base, mtl, random
 
 ## Input Files
 
