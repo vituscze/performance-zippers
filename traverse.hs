@@ -1,3 +1,6 @@
+{- cabal:
+build-depends: base, bytestring, criterion, mtl, unboxed-ref, vector
+-}
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# OPTIONS_GHC -funbox-strict-fields #-}
@@ -230,7 +233,7 @@ data TestCase = Case !(V.Vector Int64) !Tree
 convert :: V.Vector Int64 -> V.Vector Int64
 convert = V.fromList . reverse . snd . V.foldl' go ([], [])
   where
-    go (s@ ~(_:s'), r) x = case x of
+    go (s@(~(_:s')), r) x = case x of
         0 -> (s',  r)
         1 -> (1:s, r)
         2 -> (2:s, r)

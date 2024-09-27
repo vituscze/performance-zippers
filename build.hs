@@ -1,3 +1,6 @@
+{- cabal:
+build-depends: base, criterion
+-}
 {-# LANGUAGE BangPatterns #-}
 {-# OPTIONS -funbox-strict-fields #-}
 module Main where

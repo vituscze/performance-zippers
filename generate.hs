@@ -1,5 +1,9 @@
+{- cabal:
+build-depends: base, mtl, random
+-}
 module Main where
 
+import Control.Monad
 import Control.Monad.State
 import System.Environment
 import System.Random

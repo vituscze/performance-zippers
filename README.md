@@ -45,6 +45,10 @@ C++ and C# programs depend on their respective standard libraries. Haskell depen
 * `traverse.hs`: base, bytestring, criterion, mtl, unboxed-ref, vector
 * `generate.hs`: base, mtl, random
 
+Haskell source files contain cabal metadata blocks that can be used with
+`cabal run` to handle the dependencies automatically. Make sure to pass
+the correct GHC options with `--ghc-options=`.
+
 ## Input Files
 
 The input files for testing no bias, bottom bias, right bias, and bottom-right bias were
